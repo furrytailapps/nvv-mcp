@@ -28,12 +28,12 @@ type GetAreaGeometryInput = {
 
 export const getAreaGeometryHandler = withErrorHandling(
   async (args: GetAreaGeometryInput) => {
-    const { areaId, status } = args;
-    const geometry = await nvvClient.getAreaWkt(areaId, status ?? "Gällande");
+    const { areaId, status = "Gällande" } = args;
+    const geometry = await nvvClient.getAreaWkt(areaId, status);
 
     return {
       areaId,
-      status: status ?? "Gällande",
+      status,
       geometry,
       coordinate_system: "EPSG:3006 (SWEREF99 TM)"
     };

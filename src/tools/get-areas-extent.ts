@@ -23,12 +23,11 @@ type GetAreasExtentInput = {
 
 export const getAreasExtentHandler = withErrorHandling(
   async (args: GetAreasExtentInput) => {
-    const { areaIds } = args;
-    const extent = await nvvClient.getAreasExtent(areaIds);
+    const extent = await nvvClient.getAreasExtent(args.areaIds);
 
     return {
-      area_ids: areaIds,
-      count: areaIds.length,
+      area_ids: args.areaIds,
+      count: args.areaIds.length,
       extent,
       coordinate_system: "EPSG:3006 (SWEREF99 TM)"
     };

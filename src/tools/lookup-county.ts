@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { withErrorHandling } from "@/lib/response";
+import { searchAndSort } from "@/lib/search-helpers";
 import type { County } from "@/types/nvv-api";
 import lanData from "@/data/lan.json";
 
@@ -26,24 +27,10 @@ type LookupCountyInput = {
 
 export const lookupCountyHandler = withErrorHandling(
   async (args: LookupCountyInput) => {
-    const { query } = args;
-    const lowerQuery = query.toLowerCase();
-
-    const matches = lan.filter(l =>
-      l.name.toLowerCase().includes(lowerQuery)
-    );
-
-    // Sort by relevance - exact matches first, then by name
-    matches.sort((a, b) => {
-      const aExact = a.name.toLowerCase() === lowerQuery;
-      const bExact = b.name.toLowerCase() === lowerQuery;
-      if (aExact && !bExact) return -1;
-      if (!aExact && bExact) return 1;
-      return a.name.localeCompare(b.name, "sv");
-    });
+    const matches = searchAndSort(lan, args.query);
 
     return {
-      query,
+      query: args.query,
       count: matches.length,
       counties: matches
     };

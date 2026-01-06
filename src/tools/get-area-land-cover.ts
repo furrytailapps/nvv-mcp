@@ -27,12 +27,12 @@ type GetAreaLandCoverInput = {
 
 export const getAreaLandCoverHandler = withErrorHandling(
   async (args: GetAreaLandCoverInput) => {
-    const { areaId, status } = args;
-    const landCover = await nvvClient.getAreaLandCover(areaId, status ?? "Gällande");
+    const { areaId, status = "Gällande" } = args;
+    const landCover = await nvvClient.getAreaLandCover(areaId, status);
 
     return {
       areaId,
-      status: status ?? "Gällande",
+      status,
       count: landCover.length,
       land_cover: landCover
     };

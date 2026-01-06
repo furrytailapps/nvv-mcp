@@ -27,12 +27,12 @@ type GetAreaEnvironmentalGoalsInput = {
 
 export const getAreaEnvironmentalGoalsHandler = withErrorHandling(
   async (args: GetAreaEnvironmentalGoalsInput) => {
-    const { areaId, status } = args;
-    const goals = await nvvClient.getAreaEnvironmentalGoals(areaId, status ?? "Gällande");
+    const { areaId, status = "Gällande" } = args;
+    const goals = await nvvClient.getAreaEnvironmentalGoals(areaId, status);
 
     return {
       areaId,
-      status: status ?? "Gällande",
+      status,
       count: goals.length,
       environmental_goals: goals
     };

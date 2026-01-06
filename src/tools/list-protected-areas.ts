@@ -41,21 +41,14 @@ type ListProtectedAreasInput = {
 
 export const listProtectedAreasHandler = withErrorHandling(
   async (args: ListProtectedAreasInput) => {
-    const { kommun, lan, namn, limit } = args;
-
     // Validate at least one search parameter is provided
-    if (!kommun && !lan && !namn) {
+    if (!args.kommun && !args.lan && !args.namn) {
       throw new ValidationError(
         "At least one search parameter must be provided: kommun, lan, or namn"
       );
     }
 
-    const areas = await nvvClient.listAreas({
-      kommun,
-      lan,
-      namn,
-      limit: limit ?? 100
-    });
+    const areas = await nvvClient.listAreas(args);
 
     return {
       count: areas.length,

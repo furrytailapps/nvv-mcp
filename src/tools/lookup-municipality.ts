@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { withErrorHandling } from "@/lib/response";
+import { searchAndSort } from "@/lib/search-helpers";
 import type { Municipality } from "@/types/nvv-api";
 import kommunerData from "@/data/kommuner.json";
 
@@ -26,24 +27,10 @@ type LookupMunicipalityInput = {
 
 export const lookupMunicipalityHandler = withErrorHandling(
   async (args: LookupMunicipalityInput) => {
-    const { query } = args;
-    const lowerQuery = query.toLowerCase();
-
-    const matches = kommuner.filter(k =>
-      k.name.toLowerCase().includes(lowerQuery)
-    );
-
-    // Sort by relevance - exact matches first, then by name
-    matches.sort((a, b) => {
-      const aExact = a.name.toLowerCase() === lowerQuery;
-      const bExact = b.name.toLowerCase() === lowerQuery;
-      if (aExact && !bExact) return -1;
-      if (!aExact && bExact) return 1;
-      return a.name.localeCompare(b.name, "sv");
-    });
+    const matches = searchAndSort(kommuner, args.query);
 
     return {
-      query,
+      query: args.query,
       count: matches.length,
       municipalities: matches.slice(0, 20) // Return max 20 results
     };

@@ -27,12 +27,12 @@ type GetAreaRegulationsInput = {
 
 export const getAreaRegulationsHandler = withErrorHandling(
   async (args: GetAreaRegulationsInput) => {
-    const { areaId, status } = args;
-    const regulations = await nvvClient.getAreaRegulations(areaId, status ?? "Gällande");
+    const { areaId, status = "Gällande" } = args;
+    const regulations = await nvvClient.getAreaRegulations(areaId, status);
 
     return {
       areaId,
-      status: status ?? "Gällande",
+      status,
       count: regulations.length,
       regulations
     };

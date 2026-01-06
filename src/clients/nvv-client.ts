@@ -76,18 +76,16 @@ export const nvvClient = {
    * Get WKT geometry for an area
    * Endpoint: GET /omrade/{areaId}/{status}/wkt
    */
-  async getAreaWkt(areaId: string, status: string = "Gällande"): Promise<string> {
-    const encodedStatus = encodeURIComponent(status);
-    return client.request<string>(`/omrade/${areaId}/${encodedStatus}/wkt`);
+  async getAreaWkt(areaId: string, status = "Gällande"): Promise<string> {
+    return client.request<string>(`/omrade/${areaId}/${encodeURIComponent(status)}/wkt`);
   },
 
   /**
    * Get purposes for an area
    * Endpoint: GET /omrade/{areaId}/{status}/syften
    */
-  async getAreaPurposes(areaId: string, status: string = "Gällande"): Promise<Purpose[]> {
-    const encodedStatus = encodeURIComponent(status);
-    const data = await client.request<NvvSyfte[]>(`/omrade/${areaId}/${encodedStatus}/syften`);
+  async getAreaPurposes(areaId: string, status = "Gällande"): Promise<Purpose[]> {
+    const data = await client.request<NvvSyfte[]>(`/omrade/${areaId}/${encodeURIComponent(status)}/syften`);
     return data.map(s => ({
       name: s.namn,
       description: s.beskrivning
@@ -98,9 +96,8 @@ export const nvvClient = {
    * Get land cover classification
    * Endpoint: GET /omrade/{areaId}/{status}/nmdklasser
    */
-  async getAreaLandCover(areaId: string, status: string = "Gällande"): Promise<LandCover[]> {
-    const encodedStatus = encodeURIComponent(status);
-    const data = await client.request<NvvNmdKlass[]>(`/omrade/${areaId}/${encodedStatus}/nmdklasser`);
+  async getAreaLandCover(areaId: string, status = "Gällande"): Promise<LandCover[]> {
+    const data = await client.request<NvvNmdKlass[]>(`/omrade/${areaId}/${encodeURIComponent(status)}/nmdklasser`);
     return data.map(n => ({
       name: n.namn,
       code: n.kod,
@@ -112,22 +109,18 @@ export const nvvClient = {
    * Get environmental goals
    * Endpoint: GET /omrade/{areaId}/{status}/miljomal
    */
-  async getAreaEnvironmentalGoals(areaId: string, status: string = "Gällande"): Promise<EnvironmentalGoal[]> {
-    const encodedStatus = encodeURIComponent(status);
-    const data = await client.request<NvvMiljomal[]>(`/omrade/${areaId}/${encodedStatus}/miljomal`);
-    return data.map(m => ({
-      name: m.namn
-    }));
+  async getAreaEnvironmentalGoals(areaId: string, status = "Gällande"): Promise<EnvironmentalGoal[]> {
+    const data = await client.request<NvvMiljomal[]>(`/omrade/${areaId}/${encodeURIComponent(status)}/miljomal`);
+    return data.map(m => ({ name: m.namn }));
   },
 
   /**
    * Get regulation zones
    * Endpoint: GET /omrade/{areaId}/{status}/foreskriftsomraden
    */
-  async getAreaRegulations(areaId: string, status: string = "Gällande"): Promise<Regulation[]> {
-    const encodedStatus = encodeURIComponent(status);
+  async getAreaRegulations(areaId: string, status = "Gällande"): Promise<Regulation[]> {
     const data = await client.request<NvvForeskriftsomrade[]>(
-      `/omrade/${areaId}/${encodedStatus}/foreskriftsomraden`
+      `/omrade/${areaId}/${encodeURIComponent(status)}/foreskriftsomraden`
     );
     return data.map(f => ({
       type: f.foreskriftstyp,

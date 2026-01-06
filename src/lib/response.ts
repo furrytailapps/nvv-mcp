@@ -27,18 +27,13 @@ export function successResponse(data: unknown): ToolResponse {
  * Build an error response that AI can understand
  */
 export function errorResponse(error: McpToolError | Error): ToolResponse {
-  const errorData = "code" in error
-    ? {
-        error: true,
-        code: (error as McpToolError).code,
-        message: error.message,
-        details: (error as McpToolError).details
-      }
-    : {
-        error: true,
-        code: "INTERNAL_ERROR",
-        message: error.message
-      };
+  const isMcpError = error instanceof Error && "code" in error;
+  const errorData = {
+    error: true,
+    code: isMcpError ? (error as McpToolError).code : "INTERNAL_ERROR",
+    message: error.message,
+    ...(isMcpError && { details: (error as McpToolError).details })
+  };
 
   return {
     content: [{

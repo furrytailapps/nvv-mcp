@@ -10,10 +10,7 @@ interface HttpClientConfig {
  * Create a typed HTTP client for API wrapping
  */
 export function createHttpClient(config: HttpClientConfig) {
-  const { baseUrl: rawBaseUrl, timeout = 30000, headers = {} } = config;
-
-  // Ensure baseUrl ends with / for proper URL joining
-  const baseUrl = rawBaseUrl.endsWith('/') ? rawBaseUrl : rawBaseUrl + '/';
+  const { baseUrl, timeout = 30000, headers = {} } = config;
 
   async function request<T>(
     path: string,
@@ -27,7 +24,7 @@ export function createHttpClient(config: HttpClientConfig) {
 
     // Build URL with query params (strip leading / from path if present)
     const cleanPath = path.startsWith('/') ? path.substring(1) : path;
-    const url = new URL(cleanPath, baseUrl);
+    const url = new URL(cleanPath, baseUrl.endsWith('/') ? baseUrl : baseUrl + '/');
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
@@ -56,7 +53,7 @@ export function createHttpClient(config: HttpClientConfig) {
         throw new UpstreamApiError(
           `API request failed: ${response.status} ${response.statusText}`,
           response.status,
-          rawBaseUrl
+          baseUrl
         );
       }
 
@@ -75,14 +72,14 @@ export function createHttpClient(config: HttpClientConfig) {
         throw new UpstreamApiError(
           `Request timeout after ${timeout}ms`,
           0,
-          rawBaseUrl
+          baseUrl
         );
       }
 
       throw new UpstreamApiError(
         `Network error: ${error instanceof Error ? error.message : "Unknown"}`,
         0,
-        rawBaseUrl
+        baseUrl
       );
     }
   }

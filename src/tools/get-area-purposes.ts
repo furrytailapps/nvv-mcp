@@ -27,12 +27,12 @@ type GetAreaPurposesInput = {
 
 export const getAreaPurposesHandler = withErrorHandling(
   async (args: GetAreaPurposesInput) => {
-    const { areaId, status } = args;
-    const purposes = await nvvClient.getAreaPurposes(areaId, status ?? "Gällande");
+    const { areaId, status = "Gällande" } = args;
+    const purposes = await nvvClient.getAreaPurposes(areaId, status);
 
     return {
       areaId,
-      status: status ?? "Gällande",
+      status,
       count: purposes.length,
       purposes
     };
