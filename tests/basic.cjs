@@ -24,7 +24,7 @@ async function testMCP(method, params = {}) {
     jsonrpc: '2.0',
     id: Date.now(),
     method,
-    params
+    params,
   });
 
   const options = {
@@ -35,14 +35,14 @@ async function testMCP(method, params = {}) {
     headers: {
       'Content-Type': 'application/json',
       'Content-Length': data.length,
-      'Accept': 'application/json, text/event-stream'
-    }
+      'Accept': 'application/json, text/event-stream',
+    },
   };
 
   return new Promise((resolve, reject) => {
     const req = http.request(options, (res) => {
       let body = '';
-      res.on('data', (chunk) => body += chunk);
+      res.on('data', (chunk) => (body += chunk));
       res.on('end', () => {
         // Try to parse as SSE first
         const parsed = parseSSE(body);
@@ -74,7 +74,7 @@ async function main() {
   const initResult = await testMCP('initialize', {
     protocolVersion: '2024-11-05',
     capabilities: {},
-    clientInfo: { name: 'test-client', version: '1.0.0' }
+    clientInfo: { name: 'test-client', version: '1.0.0' },
   });
   console.log('   ✅ Initialize:', initResult.result ? 'OK' : 'FAILED');
   if (initResult.result?.serverInfo) {
@@ -86,7 +86,7 @@ async function main() {
   const toolsResult = await testMCP('tools/list');
   if (toolsResult.result?.tools) {
     console.log(`   ✅ Found ${toolsResult.result.tools.length} tools:`);
-    toolsResult.result.tools.forEach(t => console.log(`      - ${t.name}`));
+    toolsResult.result.tools.forEach((t) => console.log(`      - ${t.name}`));
   } else {
     console.log('   ❌ Failed to list tools');
   }
@@ -95,7 +95,7 @@ async function main() {
   console.log('\n3️⃣ Testing nvv_lookup_municipality with "Stockholm"...');
   const lookupResult = await testMCP('tools/call', {
     name: 'nvv_lookup_municipality',
-    arguments: { query: 'Stockholm' }
+    arguments: { query: 'Stockholm' },
   });
 
   if (lookupResult.result?.content?.[0]?.text) {
@@ -112,7 +112,7 @@ async function main() {
   console.log('\n4️⃣ Testing nvv_list_protected_areas for Stockholm (kommun=0180)...');
   const areasResult = await testMCP('tools/call', {
     name: 'nvv_list_protected_areas',
-    arguments: { kommun: '0180', limit: 5 }
+    arguments: { kommun: '0180', limit: 5 },
   });
 
   if (areasResult.result?.content?.[0]?.text) {

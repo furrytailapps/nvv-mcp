@@ -114,4 +114,4 @@ export interface County {
 
 // Default decision status for area queries
 // "Gällande" means "Current/Valid" in Swedish
-export const DEFAULT_DECISION_STATUS = "Gällande";
+export const DEFAULT_DECISION_STATUS = 'Gällande';

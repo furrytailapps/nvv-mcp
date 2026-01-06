@@ -21,7 +21,7 @@ async function testMCP(method, params = {}) {
     jsonrpc: '2.0',
     id: Date.now(),
     method,
-    params
+    params,
   });
 
   const options = {
@@ -32,14 +32,14 @@ async function testMCP(method, params = {}) {
     headers: {
       'Content-Type': 'application/json',
       'Content-Length': data.length,
-      'Accept': 'application/json, text/event-stream'
-    }
+      'Accept': 'application/json, text/event-stream',
+    },
   };
 
   return new Promise((resolve, reject) => {
     const req = http.request(options, (res) => {
       let body = '';
-      res.on('data', (chunk) => body += chunk);
+      res.on('data', (chunk) => (body += chunk));
       res.on('end', () => {
         const parsed = parseSSE(body);
         if (parsed) {
@@ -80,10 +80,9 @@ async function main() {
     const initResult = await testMCP('initialize', {
       protocolVersion: '2024-11-05',
       capabilities: {},
-      clientInfo: { name: 'verify-test', version: '1.0.0' }
+      clientInfo: { name: 'verify-test', version: '1.0.0' },
     });
-    recordTest('Initialize', !!initResult.result?.serverInfo,
-      `(server: ${initResult.result?.serverInfo?.name || 'unknown'})`);
+    recordTest('Initialize', !!initResult.result?.serverInfo, `(server: ${initResult.result?.serverInfo?.name || 'unknown'})`);
   } catch (error) {
     recordTest('Initialize', false, `(error: ${error.message})`);
   }
@@ -103,22 +102,26 @@ async function main() {
   try {
     const result = await testMCP('tools/call', {
       name: 'nvv_lookup_municipality',
-      arguments: { query: 'Stockholm' }
+      arguments: { query: 'Stockholm' },
     });
     const data = JSON.parse(result.result?.content?.[0]?.text || '{}');
-    recordTest('Municipality lookup - exact match',
+    recordTest(
+      'Municipality lookup - exact match',
       data.municipalities?.[0]?.code === '0180',
-      `(found: ${data.municipalities?.[0]?.name || 'none'})`);
+      `(found: ${data.municipalities?.[0]?.name || 'none'})`,
+    );
 
     // Test partial match and sorting
     const partialResult = await testMCP('tools/call', {
       name: 'nvv_lookup_municipality',
-      arguments: { query: 'stock' }
+      arguments: { query: 'stock' },
     });
     const partialData = JSON.parse(partialResult.result?.content?.[0]?.text || '{}');
-    recordTest('Municipality lookup - fuzzy search',
+    recordTest(
+      'Municipality lookup - fuzzy search',
       partialData.count > 0 && partialData.municipalities?.[0]?.name?.toLowerCase().includes('stock'),
-      `(found ${partialData.count} matches)`);
+      `(found ${partialData.count} matches)`,
+    );
   } catch (error) {
     recordTest('Municipality lookup', false, `(error: ${error.message})`);
   }
@@ -128,12 +131,10 @@ async function main() {
   try {
     const result = await testMCP('tools/call', {
       name: 'nvv_lookup_county',
-      arguments: { query: 'Stockholm' }
+      arguments: { query: 'Stockholm' },
     });
     const data = JSON.parse(result.result?.content?.[0]?.text || '{}');
-    recordTest('County lookup',
-      data.counties?.[0]?.code === '01',
-      `(found: ${data.counties?.[0]?.name || 'none'})`);
+    recordTest('County lookup', data.counties?.[0]?.code === '01', `(found: ${data.counties?.[0]?.name || 'none'})`);
   } catch (error) {
     recordTest('County lookup', false, `(error: ${error.message})`);
   }
@@ -144,22 +145,18 @@ async function main() {
     // Test with kommun parameter
     const result = await testMCP('tools/call', {
       name: 'nvv_list_protected_areas',
-      arguments: { kommun: '0180', limit: 5 }
+      arguments: { kommun: '0180', limit: 5 },
     });
     const data = JSON.parse(result.result?.content?.[0]?.text || '{}');
-    recordTest('List areas by kommun',
-      data.count > 0 && data.areas?.length > 0,
-      `(found ${data.count} areas)`);
+    recordTest('List areas by kommun', data.count > 0 && data.areas?.length > 0, `(found ${data.count} areas)`);
 
     // Test validation - should fail without parameters
     const invalidResult = await testMCP('tools/call', {
       name: 'nvv_list_protected_areas',
-      arguments: { limit: 5 }
+      arguments: { limit: 5 },
     });
     const invalidData = JSON.parse(invalidResult.result?.content?.[0]?.text || '{}');
-    recordTest('List areas - error handling',
-      invalidData.error === true,
-      '(correctly rejected missing parameters)');
+    recordTest('List areas - error handling', invalidData.error === true, '(correctly rejected missing parameters)');
 
     // Store first area for subsequent tests
     global.testAreaId = data.areas?.[0]?.id;
@@ -181,12 +178,14 @@ async function main() {
   try {
     const result = await testMCP('tools/call', {
       name: 'nvv_get_area_geometry',
-      arguments: { areaId: global.testAreaId }
+      arguments: { areaId: global.testAreaId },
     });
     const data = JSON.parse(result.result?.content?.[0]?.text || '{}');
-    recordTest('Get area geometry - default status',
+    recordTest(
+      'Get area geometry - default status',
       data.geometry && (data.geometry.startsWith('MULTI') || data.geometry.startsWith('POLYGON')),
-      `(WKT length: ${data.geometry?.length || 0} chars, status: ${data.status || 'unknown'})`);
+      `(WKT length: ${data.geometry?.length || 0} chars, status: ${data.status || 'unknown'})`,
+    );
   } catch (error) {
     recordTest('Get area geometry', false, `(error: ${error.message})`);
   }
@@ -196,12 +195,10 @@ async function main() {
   try {
     const result = await testMCP('tools/call', {
       name: 'nvv_get_area_purposes',
-      arguments: { areaId: global.testAreaId }
+      arguments: { areaId: global.testAreaId },
     });
     const data = JSON.parse(result.result?.content?.[0]?.text || '{}');
-    recordTest('Get area purposes',
-      Array.isArray(data.purposes),
-      `(found ${data.purposes?.length || 0} purposes)`);
+    recordTest('Get area purposes', Array.isArray(data.purposes), `(found ${data.purposes?.length || 0} purposes)`);
   } catch (error) {
     recordTest('Get area purposes', false, `(error: ${error.message})`);
   }
@@ -211,12 +208,14 @@ async function main() {
   try {
     const result = await testMCP('tools/call', {
       name: 'nvv_get_area_land_cover',
-      arguments: { areaId: global.testAreaId }
+      arguments: { areaId: global.testAreaId },
     });
     const data = JSON.parse(result.result?.content?.[0]?.text || '{}');
-    recordTest('Get area land cover',
+    recordTest(
+      'Get area land cover',
       Array.isArray(data.land_cover),
-      `(found ${data.land_cover?.length || 0} classifications)`);
+      `(found ${data.land_cover?.length || 0} classifications)`,
+    );
   } catch (error) {
     recordTest('Get area land cover', false, `(error: ${error.message})`);
   }
@@ -226,12 +225,14 @@ async function main() {
   try {
     const result = await testMCP('tools/call', {
       name: 'nvv_get_area_environmental_goals',
-      arguments: { areaId: global.testAreaId }
+      arguments: { areaId: global.testAreaId },
     });
     const data = JSON.parse(result.result?.content?.[0]?.text || '{}');
-    recordTest('Get environmental goals',
+    recordTest(
+      'Get environmental goals',
       Array.isArray(data.environmental_goals),
-      `(found ${data.environmental_goals?.length || 0} goals)`);
+      `(found ${data.environmental_goals?.length || 0} goals)`,
+    );
   } catch (error) {
     recordTest('Get environmental goals', false, `(error: ${error.message})`);
   }
@@ -241,12 +242,10 @@ async function main() {
   try {
     const result = await testMCP('tools/call', {
       name: 'nvv_get_area_regulations',
-      arguments: { areaId: global.testAreaId }
+      arguments: { areaId: global.testAreaId },
     });
     const data = JSON.parse(result.result?.content?.[0]?.text || '{}');
-    recordTest('Get area regulations',
-      Array.isArray(data.regulations),
-      `(found ${data.regulations?.length || 0} regulations)`);
+    recordTest('Get area regulations', Array.isArray(data.regulations), `(found ${data.regulations?.length || 0} regulations)`);
   } catch (error) {
     recordTest('Get area regulations', false, `(error: ${error.message})`);
   }
@@ -256,12 +255,14 @@ async function main() {
   try {
     const result = await testMCP('tools/call', {
       name: 'nvv_get_areas_extent',
-      arguments: { areaIds: [global.testAreaId] }
+      arguments: { areaIds: [global.testAreaId] },
     });
     const data = JSON.parse(result.result?.content?.[0]?.text || '{}');
-    recordTest('Get areas extent',
+    recordTest(
+      'Get areas extent',
       data.extent && data.extent.startsWith('POLYGON'),
-      `(WKT: ${data.extent?.substring(0, 50)}...)`);
+      `(WKT: ${data.extent?.substring(0, 50)}...)`,
+    );
   } catch (error) {
     recordTest('Get areas extent', false, `(error: ${error.message})`);
   }
@@ -280,9 +281,11 @@ function printSummary(results) {
 
   if (results.failed > 0) {
     console.log('\nFailed Tests:');
-    results.tests.filter(t => !t.passed).forEach(t => {
-      console.log(`  - ${t.name} ${t.details}`);
-    });
+    results.tests
+      .filter((t) => !t.passed)
+      .forEach((t) => {
+        console.log(`  - ${t.name} ${t.details}`);
+      });
   }
 
   console.log('='.repeat(60) + '\n');

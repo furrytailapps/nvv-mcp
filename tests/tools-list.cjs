@@ -20,7 +20,7 @@ async function testMCP(method, params = {}) {
     jsonrpc: '2.0',
     id: Date.now(),
     method,
-    params
+    params,
   });
 
   const options = {
@@ -31,14 +31,14 @@ async function testMCP(method, params = {}) {
     headers: {
       'Content-Type': 'application/json',
       'Content-Length': data.length,
-      'Accept': 'application/json, text/event-stream'
-    }
+      'Accept': 'application/json, text/event-stream',
+    },
   };
 
   return new Promise((resolve, reject) => {
     const req = http.request(options, (res) => {
       let body = '';
-      res.on('data', (chunk) => body += chunk);
+      res.on('data', (chunk) => (body += chunk));
       res.on('end', () => {
         const parsed = parseSSE(body);
         if (parsed) {

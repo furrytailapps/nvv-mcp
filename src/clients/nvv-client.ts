@@ -1,4 +1,4 @@
-import { createHttpClient } from "@/lib/http-client";
+import { createHttpClient } from '@/lib/http-client';
 import {
   DEFAULT_DECISION_STATUS,
   type NvvArea,
@@ -10,14 +10,14 @@ import {
   type Purpose,
   type LandCover,
   type EnvironmentalGoal,
-  type Regulation
-} from "@/types/nvv-api";
+  type Regulation,
+} from '@/types/nvv-api';
 
-const NVV_API_BASE = "https://geodata.naturvardsverket.se/naturvardsregistret/rest/v3";
+const NVV_API_BASE = 'https://geodata.naturvardsverket.se/naturvardsregistret/rest/v3';
 
 const client = createHttpClient({
   baseUrl: NVV_API_BASE,
-  timeout: 30000
+  timeout: 30000,
 });
 
 /**
@@ -46,7 +46,7 @@ function transformArea(area: NvvArea): ProtectedArea {
     exemption_authority: area.provningsmyndighetDispens,
     iucn_category: area.iucnKategori,
     decision_type: area.beslutstyp,
-    description: area.beskrivning
+    description: area.beskrivning,
   };
 }
 
@@ -56,19 +56,14 @@ export const nvvClient = {
    * Accepts kommun (municipality code), lan (county code), or namn (area name)
    * Endpoint: GET /omrade/nolinks
    */
-  async listAreas(params: {
-    kommun?: string;
-    lan?: string;
-    namn?: string;
-    limit?: number;
-  }): Promise<ProtectedArea[]> {
-    const areas = await client.request<NvvArea[]>("/omrade/nolinks", {
+  async listAreas(params: { kommun?: string; lan?: string; namn?: string; limit?: number }): Promise<ProtectedArea[]> {
+    const areas = await client.request<NvvArea[]>('/omrade/nolinks', {
       params: {
         kommun: params.kommun,
         lan: params.lan,
         namn: params.namn,
-        limit: params.limit ?? 100
-      }
+        limit: params.limit ?? 100,
+      },
     });
     return areas.map(transformArea);
   },
@@ -87,9 +82,9 @@ export const nvvClient = {
    */
   async getAreaPurposes(areaId: string, status = DEFAULT_DECISION_STATUS): Promise<Purpose[]> {
     const data = await client.request<NvvSyfte[]>(`/omrade/${areaId}/${encodeURIComponent(status)}/syften`);
-    return data.map(s => ({
+    return data.map((s) => ({
       name: s.namn,
-      description: s.beskrivning
+      description: s.beskrivning,
     }));
   },
 
@@ -99,10 +94,10 @@ export const nvvClient = {
    */
   async getAreaLandCover(areaId: string, status = DEFAULT_DECISION_STATUS): Promise<LandCover[]> {
     const data = await client.request<NvvNmdKlass[]>(`/omrade/${areaId}/${encodeURIComponent(status)}/nmdklasser`);
-    return data.map(n => ({
+    return data.map((n) => ({
       name: n.namn,
       code: n.kod,
-      area_ha: n.areaHa
+      area_ha: n.areaHa,
     }));
   },
 
@@ -112,7 +107,7 @@ export const nvvClient = {
    */
   async getAreaEnvironmentalGoals(areaId: string, status = DEFAULT_DECISION_STATUS): Promise<EnvironmentalGoal[]> {
     const data = await client.request<NvvMiljomal[]>(`/omrade/${areaId}/${encodeURIComponent(status)}/miljomal`);
-    return data.map(m => ({ name: m.namn }));
+    return data.map((m) => ({ name: m.namn }));
   },
 
   /**
@@ -121,12 +116,12 @@ export const nvvClient = {
    */
   async getAreaRegulations(areaId: string, status = DEFAULT_DECISION_STATUS): Promise<Regulation[]> {
     const data = await client.request<NvvForeskriftsomrade[]>(
-      `/omrade/${areaId}/${encodeURIComponent(status)}/foreskriftsomraden`
+      `/omrade/${areaId}/${encodeURIComponent(status)}/foreskriftsomraden`,
     );
-    return data.map(f => ({
+    return data.map((f) => ({
       type: f.foreskriftstyp,
       subtype: f.foreskriftssubtyp,
-      area_ha: f.areaHa
+      area_ha: f.areaHa,
     }));
   },
 
@@ -135,8 +130,8 @@ export const nvvClient = {
    * Endpoint: GET /omrade/extentAsWkt
    */
   async getAreasExtent(areaIds: string[]): Promise<string> {
-    return client.request<string>("/omrade/extentAsWkt", {
-      params: { id: areaIds.join(",") }
+    return client.request<string>('/omrade/extentAsWkt', {
+      params: { id: areaIds.join(',') },
     });
-  }
+  },
 };

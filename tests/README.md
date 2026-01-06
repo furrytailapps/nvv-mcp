@@ -29,23 +29,28 @@ node tests/tools-list.cjs
 ## Test Files
 
 ### basic.cjs
+
 Basic connectivity and tool availability test.
 
 **Tests:**
+
 - MCP server connectivity
 - Tools list endpoint
 - Basic tool invocation
 - Response format validation
 
 **Usage:**
+
 ```bash
 node tests/basic.cjs
 ```
 
 ### comprehensive.cjs
+
 Comprehensive test of all 9 tools with various scenarios.
 
 **Tests:**
+
 - `nvv_list_protected_areas` - With kommun, län, namn filters
 - `nvv_get_area_geometry` - WKT geometry retrieval
 - `nvv_get_area_purposes` - Protection purposes
@@ -57,11 +62,13 @@ Comprehensive test of all 9 tools with various scenarios.
 - `nvv_lookup_county` - County code lookup
 
 **Usage:**
+
 ```bash
 node tests/comprehensive.cjs
 ```
 
 **Expected Output:**
+
 ```
 ✅ List Protected Areas (by kommun): Found 5 areas
 ✅ Get Area Geometry: Retrieved WKT geometry
@@ -71,9 +78,11 @@ All comprehensive tests passed! ✅
 ```
 
 ### edge-cases.cjs
+
 Error handling and edge case validation.
 
 **Tests:**
+
 - Invalid area IDs
 - Missing required parameters
 - Empty results handling
@@ -82,54 +91,65 @@ Error handling and edge case validation.
 - Invalid municipality/county codes
 
 **Usage:**
+
 ```bash
 node tests/edge-cases.cjs
 ```
 
 ### geometry.cjs
+
 Focused testing of geometry retrieval.
 
 **Tests:**
+
 - WKT format validation
 - SWEREF99 TM coordinate system
 - Polygon geometry structure
 - Multi-polygon handling
 
 **Usage:**
+
 ```bash
 node tests/geometry.cjs
 ```
 
 ### single-tool.cjs
+
 Isolation testing for individual tool debugging.
 
 **Tests:**
+
 - Single tool invocation
 - Parameter validation
 - Response structure
 - Error handling
 
 **Usage:**
+
 ```bash
 # Edit the file to change which tool is tested
 node tests/single-tool.cjs
 ```
 
 ### tools-list.cjs
+
 MCP tools list validation.
 
 **Tests:**
+
 - All 9 tools are registered
 - Tool schemas are valid
 - Tool descriptions are present
 - Input parameters are documented
 
 **Usage:**
+
 ```bash
 node tests/tools-list.cjs
 ```
 
 **Expected Output:**
+
 ```
 Available tools:
   1. nvv_list_protected_areas
@@ -152,11 +172,13 @@ The tests use real data from the Naturvårdsverket API:
 ### Server Not Running
 
 **Error:**
+
 ```
 Error: connect ECONNREFUSED 127.0.0.1:3000
 ```
 
 **Solution:**
+
 ```bash
 # Start the dev server in a separate terminal
 npm run dev
@@ -165,22 +187,26 @@ npm run dev
 ### API Rate Limiting
 
 **Error:**
+
 ```
 Error: API request failed: 429 Too Many Requests
 ```
 
 **Solution:**
+
 - Wait a few seconds between test runs
 - The Naturvårdsverket API has rate limits
 
 ### Invalid Test Data
 
 **Error:**
+
 ```
 Error: Protected area not found
 ```
 
 **Solution:**
+
 - The test area ID may have changed
 - Update test files with current area IDs from the API
 - Use `nvv_list_protected_areas` to find valid IDs
@@ -199,10 +225,10 @@ async function testMyFeature() {
       method: 'tools/call',
       params: {
         name: 'nvv_list_protected_areas',
-        arguments: { kommun: '0180', limit: 5 }
+        arguments: { kommun: '0180', limit: 5 },
       },
-      id: 1
-    })
+      id: 1,
+    }),
   });
 
   const data = await response.json();

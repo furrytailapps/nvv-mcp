@@ -1,24 +1,19 @@
-import { z } from "zod";
-import { nvvClient } from "@/clients/nvv-client";
-import { withErrorHandling } from "@/lib/response";
-import { DEFAULT_DECISION_STATUS } from "@/types/nvv-api";
+import { z } from 'zod';
+import { nvvClient } from '@/clients/nvv-client';
+import { withErrorHandling } from '@/lib/response';
+import { DEFAULT_DECISION_STATUS } from '@/types/nvv-api';
 
 export const getAreaEnvironmentalGoalsInputSchema = {
-  areaId: z.string()
-    .min(1)
-    .describe("The unique NVR area identifier"),
-  status: z.string()
-    .default("Gällande")
-    .optional()
-    .describe("Decision status. Default: 'Gällande'")
+  areaId: z.string().min(1).describe('The unique NVR area identifier'),
+  status: z.string().default('Gällande').optional().describe("Decision status. Default: 'Gällande'"),
 };
 
 export const getAreaEnvironmentalGoalsTool = {
-  name: "nvv_get_area_environmental_goals",
+  name: 'nvv_get_area_environmental_goals',
   description:
-    "Get the Swedish environmental quality goals (miljömål) associated with a protected area. " +
+    'Get the Swedish environmental quality goals (miljömål) associated with a protected area. ' +
     "Returns which of Sweden's 16 environmental objectives the area contributes to.",
-  inputSchema: getAreaEnvironmentalGoalsInputSchema
+  inputSchema: getAreaEnvironmentalGoalsInputSchema,
 };
 
 type GetAreaEnvironmentalGoalsInput = {
@@ -26,16 +21,14 @@ type GetAreaEnvironmentalGoalsInput = {
   status?: string;
 };
 
-export const getAreaEnvironmentalGoalsHandler = withErrorHandling(
-  async (args: GetAreaEnvironmentalGoalsInput) => {
-    const { areaId, status = DEFAULT_DECISION_STATUS } = args;
-    const goals = await nvvClient.getAreaEnvironmentalGoals(areaId, status);
+export const getAreaEnvironmentalGoalsHandler = withErrorHandling(async (args: GetAreaEnvironmentalGoalsInput) => {
+  const { areaId, status = DEFAULT_DECISION_STATUS } = args;
+  const goals = await nvvClient.getAreaEnvironmentalGoals(areaId, status);
 
-    return {
-      areaId,
-      status,
-      count: goals.length,
-      environmental_goals: goals
-    };
-  }
-);
+  return {
+    areaId,
+    status,
+    count: goals.length,
+    environmental_goals: goals,
+  };
+});

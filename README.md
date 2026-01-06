@@ -79,17 +79,20 @@ No environment variables are required as the Naturvårdsverket API is publicly a
 List protected nature areas with optional filtering.
 
 **Parameters:**
+
 - `kommun` (string, optional) - Municipality code (e.g., "0180" for Stockholm)
 - `lan` (string, optional) - County code (e.g., "01" for Stockholm County)
 - `namn` (string, optional) - Name search query
 - `limit` (number, optional) - Maximum results, 1-500 (default: 100)
 
 **Example:**
+
 ```typescript
-nvv_list_protected_areas({ kommun: "0180", limit: 5 })
+nvv_list_protected_areas({ kommun: '0180', limit: 5 });
 ```
 
 **Returns:**
+
 ```json
 {
   "areas": [
@@ -112,14 +115,17 @@ nvv_list_protected_areas({ kommun: "0180", limit: 5 })
 Get WKT (Well-Known Text) geometry for a protected area.
 
 **Parameters:**
+
 - `area_id` (string, required) - Protected area ID
 
 **Example:**
+
 ```typescript
-nvv_get_area_geometry({ area_id: "2000603" })
+nvv_get_area_geometry({ area_id: '2000603' });
 ```
 
 **Returns:**
+
 ```json
 {
   "area_id": "2000603",
@@ -134,14 +140,17 @@ nvv_get_area_geometry({ area_id: "2000603" })
 Get protection purposes and classifications.
 
 **Parameters:**
+
 - `area_id` (string, required) - Protected area ID
 
 **Example:**
+
 ```typescript
-nvv_get_area_purposes({ area_id: "2000603" })
+nvv_get_area_purposes({ area_id: '2000603' });
 ```
 
 **Returns:**
+
 ```json
 {
   "area_id": "2000603",
@@ -160,14 +169,17 @@ nvv_get_area_purposes({ area_id: "2000603" })
 Get detailed land cover classification (NMD - National Land Cover Database).
 
 **Parameters:**
+
 - `area_id` (string, required) - Protected area ID
 
 **Example:**
+
 ```typescript
-nvv_get_area_land_cover({ area_id: "2000603" })
+nvv_get_area_land_cover({ area_id: '2000603' });
 ```
 
 **Returns:**
+
 ```json
 {
   "area_id": "2000603",
@@ -189,14 +201,17 @@ nvv_get_area_land_cover({ area_id: "2000603" })
 Get Swedish environmental objectives (miljömål) related to the area.
 
 **Parameters:**
+
 - `area_id` (string, required) - Protected area ID
 
 **Example:**
+
 ```typescript
-nvv_get_area_environmental_goals({ area_id: "2000603" })
+nvv_get_area_environmental_goals({ area_id: '2000603' });
 ```
 
 **Returns:**
+
 ```json
 {
   "area_id": "2000603",
@@ -215,14 +230,17 @@ nvv_get_area_environmental_goals({ area_id: "2000603" })
 Get regulation zones (föreskriftsområden) within the protected area.
 
 **Parameters:**
+
 - `area_id` (string, required) - Protected area ID
 
 **Example:**
+
 ```typescript
-nvv_get_area_regulations({ area_id: "2000603" })
+nvv_get_area_regulations({ area_id: '2000603' });
 ```
 
 **Returns:**
+
 ```json
 {
   "area_id": "2000603",
@@ -242,14 +260,17 @@ nvv_get_area_regulations({ area_id: "2000603" })
 Calculate bounding box (extent) for one or more protected areas.
 
 **Parameters:**
+
 - `area_ids` (array of strings, required) - Protected area IDs
 
 **Example:**
+
 ```typescript
-nvv_get_areas_extent({ area_ids: ["2000603", "2000604"] })
+nvv_get_areas_extent({ area_ids: ['2000603', '2000604'] });
 ```
 
 **Returns:**
+
 ```json
 {
   "extent": {
@@ -268,14 +289,17 @@ nvv_get_areas_extent({ area_ids: ["2000603", "2000604"] })
 Search for Swedish municipality codes.
 
 **Parameters:**
+
 - `query` (string, required) - Municipality name or partial name
 
 **Example:**
+
 ```typescript
-nvv_lookup_municipality({ query: "Stockholm" })
+nvv_lookup_municipality({ query: 'Stockholm' });
 ```
 
 **Returns:**
+
 ```json
 {
   "matches": [
@@ -292,14 +316,17 @@ nvv_lookup_municipality({ query: "Stockholm" })
 Search for Swedish county codes.
 
 **Parameters:**
+
 - `query` (string, required) - County name or partial name
 
 **Example:**
+
 ```typescript
-nvv_lookup_county({ query: "Stockholm" })
+nvv_lookup_county({ query: 'Stockholm' });
 ```
 
 **Returns:**
+
 ```json
 {
   "matches": [
@@ -314,14 +341,17 @@ nvv_lookup_county({ query: "Stockholm" })
 ## API Reference
 
 ### Base API
+
 - **URL:** `https://geodata.naturvardsverket.se/naturvardsregistret/rest/v3`
 - **Documentation:** [Naturvårdsverket API](https://www.naturvardsverket.se/)
 
 ### Coordinate System
+
 - **System:** SWEREF99 TM (EPSG:3006)
 - **Format:** WKT (Well-Known Text)
 
 ### Status Values
+
 - `Gällande` - Active/In effect
 - `Överklagat` - Appealed
 - `Beslutat` - Decided
@@ -332,19 +362,19 @@ nvv_lookup_county({ query: "Stockholm" })
 
 ```typescript
 // Step 1: Look up municipality code
-const municipality = await nvv_lookup_municipality({ query: "Stockholm" });
+const municipality = await nvv_lookup_municipality({ query: 'Stockholm' });
 // Returns: { code: "0180", name: "Stockholm" }
 
 // Step 2: List protected areas
 const areas = await nvv_list_protected_areas({
-  kommun: "0180",
-  limit: 5
+  kommun: '0180',
+  limit: 5,
 });
 // Returns: 5 protected areas including Judarskogen
 
 // Step 3: Get detailed geometry
 const geometry = await nvv_get_area_geometry({
-  area_id: areas.areas[0].id
+  area_id: areas.areas[0].id,
 });
 // Returns: WKT geometry in SWEREF99 TM
 ```
@@ -354,13 +384,13 @@ const geometry = await nvv_get_area_geometry({
 ```typescript
 // Get land cover classification
 const landCover = await nvv_get_area_land_cover({
-  area_id: "2000603"
+  area_id: '2000603',
 });
 // Returns: Detailed breakdown of forest types, wetlands, etc.
 
 // Get environmental goals
 const goals = await nvv_get_area_environmental_goals({
-  area_id: "2000603"
+  area_id: '2000603',
 });
 // Returns: Related Swedish environmental objectives
 ```
@@ -381,6 +411,7 @@ node tests/comprehensive.cjs
 ```
 
 Available test files:
+
 - `basic.cjs` - Basic connectivity and tool availability
 - `comprehensive.cjs` - All tools with various scenarios
 - `edge-cases.cjs` - Error handling and edge cases
@@ -435,9 +466,7 @@ The project includes `vercel.json` with optimized settings:
 
 ```json
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/$1" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/$1" }]
 }
 ```
 
@@ -474,10 +503,10 @@ Example:
 
 ```typescript
 // src/tools/my-new-tool.ts
-import { z } from "zod";
+import { z } from 'zod';
 
 export const myNewToolInputSchema = {
-  param: z.string().describe("Parameter description")
+  param: z.string().describe('Parameter description'),
 };
 
 export async function handleMyNewTool(input: { param: string }) {

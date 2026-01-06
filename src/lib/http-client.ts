@@ -1,4 +1,4 @@
-import { UpstreamApiError } from "./errors";
+import { UpstreamApiError } from './errors';
 
 interface HttpClientConfig {
   baseUrl: string;
@@ -15,12 +15,12 @@ export function createHttpClient(config: HttpClientConfig) {
   async function request<T>(
     path: string,
     options: {
-      method?: "GET" | "POST";
+      method?: 'GET' | 'POST';
       params?: Record<string, string | number | undefined>;
       body?: unknown;
-    } = {}
+    } = {},
   ): Promise<T> {
-    const { method = "GET", params, body } = options;
+    const { method = 'GET', params, body } = options;
 
     // Build URL with query params (strip leading / from path if present)
     const cleanPath = path.startsWith('/') ? path.substring(1) : path;
@@ -40,47 +40,35 @@ export function createHttpClient(config: HttpClientConfig) {
       const response = await fetch(url.toString(), {
         method,
         headers: {
-          "Accept": "application/json, text/plain, */*",
-          ...headers
+          Accept: 'application/json, text/plain, */*',
+          ...headers,
         },
         body: body ? JSON.stringify(body) : undefined,
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new UpstreamApiError(
-          `API request failed: ${response.status} ${response.statusText}`,
-          response.status,
-          baseUrl
-        );
+        throw new UpstreamApiError(`API request failed: ${response.status} ${response.statusText}`, response.status, baseUrl);
       }
 
       // Handle text responses (like WKT)
-      const contentType = response.headers.get("content-type");
-      if (contentType?.includes("text/plain")) {
-        return await response.text() as T;
+      const contentType = response.headers.get('content-type');
+      if (contentType?.includes('text/plain')) {
+        return (await response.text()) as T;
       }
 
-      return await response.json() as T;
+      return (await response.json()) as T;
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof UpstreamApiError) throw error;
 
-      if (error instanceof Error && error.name === "AbortError") {
-        throw new UpstreamApiError(
-          `Request timeout after ${timeout}ms`,
-          0,
-          baseUrl
-        );
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new UpstreamApiError(`Request timeout after ${timeout}ms`, 0, baseUrl);
       }
 
-      throw new UpstreamApiError(
-        `Network error: ${error instanceof Error ? error.message : "Unknown"}`,
-        0,
-        baseUrl
-      );
+      throw new UpstreamApiError(`Network error: ${error instanceof Error ? error.message : 'Unknown'}`, 0, baseUrl);
     }
   }
 

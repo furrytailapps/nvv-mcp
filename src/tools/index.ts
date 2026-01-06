@@ -1,41 +1,14 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import {
-  listProtectedAreasTool,
-  listProtectedAreasHandler
-} from "./list-protected-areas";
-import {
-  getAreaGeometryTool,
-  getAreaGeometryHandler
-} from "./get-area-geometry";
-import {
-  getAreaPurposesTool,
-  getAreaPurposesHandler
-} from "./get-area-purposes";
-import {
-  getAreaLandCoverTool,
-  getAreaLandCoverHandler
-} from "./get-area-land-cover";
-import {
-  getAreaEnvironmentalGoalsTool,
-  getAreaEnvironmentalGoalsHandler
-} from "./get-area-env-goals";
-import {
-  getAreaRegulationsTool,
-  getAreaRegulationsHandler
-} from "./get-area-regulations";
-import {
-  getAreasExtentTool,
-  getAreasExtentHandler
-} from "./get-areas-extent";
-import {
-  lookupMunicipalityTool,
-  lookupMunicipalityHandler
-} from "./lookup-municipality";
-import {
-  lookupCountyTool,
-  lookupCountyHandler
-} from "./lookup-county";
+import { listProtectedAreasTool, listProtectedAreasHandler } from './list-protected-areas';
+import { getAreaGeometryTool, getAreaGeometryHandler } from './get-area-geometry';
+import { getAreaPurposesTool, getAreaPurposesHandler } from './get-area-purposes';
+import { getAreaLandCoverTool, getAreaLandCoverHandler } from './get-area-land-cover';
+import { getAreaEnvironmentalGoalsTool, getAreaEnvironmentalGoalsHandler } from './get-area-env-goals';
+import { getAreaRegulationsTool, getAreaRegulationsHandler } from './get-area-regulations';
+import { getAreasExtentTool, getAreasExtentHandler } from './get-areas-extent';
+import { lookupMunicipalityTool, lookupMunicipalityHandler } from './lookup-municipality';
+import { lookupCountyTool, lookupCountyHandler } from './lookup-county';
 
 const tools = [
   // NVV API wrapper tools
@@ -56,11 +29,6 @@ const tools = [
  */
 export function registerAllTools(server: McpServer): void {
   for (const { definition, handler } of tools) {
-    server.tool(
-      definition.name,
-      definition.description,
-      definition.inputSchema,
-      handler
-    );
+    server.tool(definition.name, definition.description, definition.inputSchema, handler);
   }
 }

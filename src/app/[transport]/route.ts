@@ -1,5 +1,5 @@
-import { createMcpHandler } from "mcp-handler";
-import { registerAllTools } from "@/tools";
+import { createMcpHandler } from 'mcp-handler';
+import { registerAllTools } from '@/tools';
 
 const handler = createMcpHandler(
   (server) => {
@@ -8,10 +8,10 @@ const handler = createMcpHandler(
   },
   {},
   {
-    basePath: "/",
+    basePath: '/',
     maxDuration: 60,
-    verboseLogs: process.env.NODE_ENV === "development"
-  }
+    verboseLogs: process.env.NODE_ENV === 'development',
+  },
 );
 
 export { handler as GET, handler as POST };

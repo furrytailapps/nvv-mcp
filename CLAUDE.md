@@ -12,6 +12,8 @@ This is an MCP (Model Context Protocol) server that wraps the Swedish Environmen
 
 - **Type checking**: `npm run typecheck`
 - **Linting**: `npm run lint`
+- **Format checking**: `npm run prettier`
+- **Format fixing**: `npm run prettier:fix`
 - **Development server**: `npm run dev`
 - **Build**: `npm run build`
 - **Production server**: `npm run start`
@@ -20,13 +22,19 @@ This is an MCP (Model Context Protocol) server that wraps the Swedish Environmen
 
 **CRITICAL: After making any code changes, ALWAYS run these checks in order:**
 
-1. **Type checking** - Verify TypeScript types:
+1. **Prettier** - Format code:
+
+   ```bash
+   npm run prettier:fix
+   ```
+
+2. **Type checking** - Verify TypeScript types:
 
    ```bash
    npm run typecheck
    ```
 
-2. **Linting** - Check code quality:
+3. **Linting** - Check code quality:
 
    ```bash
    npm run lint
@@ -42,13 +50,14 @@ This is an MCP (Model Context Protocol) server that wraps the Swedish Environmen
 **Workflow:**
 
 1. Make code changes
-2. Run typecheck to verify types
-3. Run lint to check for issues
-4. Fix any errors
-5. Run tests if applicable
-6. Only then commit
+2. Run prettier:fix to format code
+3. Run typecheck to verify types
+4. Run lint to check for issues
+5. Fix any errors
+6. Run tests if applicable
+7. Only then commit
 
-Type and lint errors will cause CI failures, so catching them locally is critical.
+Formatting, type, and lint errors will cause CI failures, so catching them locally is critical.
 
 ## Clean Code Principles
 
@@ -137,23 +146,23 @@ function hasRequiredSearchParameters(params: SearchParams): boolean { ... }
 
 ```typescript
 // ❌ Bad - duplicated pattern
-const purposes = data.map(s => ({
+const purposes = data.map((s) => ({
   name: s.namn,
-  description: s.beskrivning
+  description: s.beskrivning,
 }));
 
-const goals = data.map(m => ({
+const goals = data.map((m) => ({
   name: m.namn,
-  description: m.beskrivning
+  description: m.beskrivning,
 }));
 
 // ✅ Good - extracted helper (if truly reused 3+ times)
 function transformToNameDescription<T extends { namn: string; beskrivning?: string }>(
-  items: T[]
+  items: T[],
 ): Array<{ name: string; description?: string }> {
-  return items.map(item => ({
+  return items.map((item) => ({
     name: item.namn,
-    description: item.beskrivning
+    description: item.beskrivning,
   }));
 }
 ```
@@ -167,7 +176,7 @@ function transformToNameDescription<T extends { namn: string; beskrivning?: stri
 // ❌ Bad - mixed abstraction levels
 async function getAreaDetails(id: string): Promise<AreaDetails> {
   const area = await client.request(`/omrade/${id}`);
-  const purposes = area.syften.map(s => ({ name: s.namn })); // Low-level detail
+  const purposes = area.syften.map((s) => ({ name: s.namn })); // Low-level detail
   await validateArea(area);
   return formatArea(area, purposes);
 }
@@ -267,25 +276,21 @@ All tools in `src/tools/` follow this standard pattern:
 ### Tool Structure
 
 ```typescript
-import { z } from "zod";
-import { nvvClient } from "@/clients/nvv-client";
-import { withErrorHandling } from "@/lib/response";
+import { z } from 'zod';
+import { nvvClient } from '@/clients/nvv-client';
+import { withErrorHandling } from '@/lib/response';
 
 // 1. Define Zod input schema
 export const myToolInputSchema = {
-  param1: z.string()
-    .describe("Description for Claude"),
-  param2: z.number()
-    .optional()
-    .default(100)
-    .describe("Optional parameter with default")
+  param1: z.string().describe('Description for Claude'),
+  param2: z.number().optional().default(100).describe('Optional parameter with default'),
 };
 
 // 2. Define tool metadata
 export const myTool = {
-  name: "nvv_my_tool",  // Always prefix with nvv_
-  description: "Clear description of what this tool does",
-  inputSchema: myToolInputSchema
+  name: 'nvv_my_tool', // Always prefix with nvv_
+  description: 'Clear description of what this tool does',
+  inputSchema: myToolInputSchema,
 };
 
 // 3. Define TypeScript input type
@@ -295,23 +300,21 @@ type MyToolInput = {
 };
 
 // 4. Implement handler with error handling wrapper
-export const myToolHandler = withErrorHandling(
-  async (args: MyToolInput) => {
-    // Validate input
-    if (!args.param1) {
-      throw new ValidationError("param1 is required");
-    }
-
-    // Call API client
-    const result = await nvvClient.someMethod(args);
-
-    // Return clean response
-    return {
-      count: result.length,
-      data: result
-    };
+export const myToolHandler = withErrorHandling(async (args: MyToolInput) => {
+  // Validate input
+  if (!args.param1) {
+    throw new ValidationError('param1 is required');
   }
-);
+
+  // Call API client
+  const result = await nvvClient.someMethod(args);
+
+  // Return clean response
+  return {
+    count: result.length,
+    data: result,
+  };
+});
 ```
 
 ### Tool Guidelines
@@ -328,11 +331,11 @@ export const myToolHandler = withErrorHandling(
 Use custom error classes from `@/lib/errors`:
 
 ```typescript
-import { ValidationError, NotFoundError } from "@/lib/errors";
+import { ValidationError, NotFoundError } from '@/lib/errors';
 
 // Validation errors
 if (!requiredParam) {
-  throw new ValidationError("param is required");
+  throw new ValidationError('param is required');
 }
 
 // Not found errors
@@ -356,7 +359,7 @@ The `nvvClient` in `@/clients/nvv-client.ts` is the single interface to the NVV 
 
 ```typescript
 // List areas by location
-await nvvClient.listAreas({ kommun: "0180", limit: 50 });
+await nvvClient.listAreas({ kommun: '0180', limit: 50 });
 
 // Get area geometry as WKT
 await nvvClient.getAreaWkt(areaId);
@@ -368,7 +371,7 @@ await nvvClient.getAreaEnvironmentalGoals(areaId);
 await nvvClient.getAreaRegulations(areaId);
 
 // Get bounding box for multiple areas
-await nvvClient.getAreasExtent(["123", "456"]);
+await nvvClient.getAreasExtent(['123', '456']);
 ```
 
 ## Testing

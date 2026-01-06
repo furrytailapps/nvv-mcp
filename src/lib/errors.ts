@@ -6,10 +6,10 @@ export class McpToolError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly details?: Record<string, unknown>
+    public readonly details?: Record<string, unknown>,
   ) {
     super(message);
-    this.name = "McpToolError";
+    this.name = 'McpToolError';
   }
 }
 
@@ -21,10 +21,10 @@ export class UpstreamApiError extends McpToolError {
     message: string,
     public readonly statusCode: number,
     public readonly upstream: string,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ) {
-    super(message, "UPSTREAM_API_ERROR", { statusCode, upstream, ...details });
-    this.name = "UpstreamApiError";
+    super(message, 'UPSTREAM_API_ERROR', { statusCode, upstream, ...details });
+    this.name = 'UpstreamApiError';
   }
 }
 
@@ -33,12 +33,8 @@ export class UpstreamApiError extends McpToolError {
  */
 export class NotFoundError extends McpToolError {
   constructor(resourceType: string, identifier: string) {
-    super(
-      `${resourceType} not found: ${identifier}`,
-      "NOT_FOUND",
-      { resourceType, identifier }
-    );
-    this.name = "NotFoundError";
+    super(`${resourceType} not found: ${identifier}`, 'NOT_FOUND', { resourceType, identifier });
+    this.name = 'NotFoundError';
   }
 }
 
@@ -47,7 +43,7 @@ export class NotFoundError extends McpToolError {
  */
 export class ValidationError extends McpToolError {
   constructor(message: string, field?: string) {
-    super(message, "VALIDATION_ERROR", { field });
-    this.name = "ValidationError";
+    super(message, 'VALIDATION_ERROR', { field });
+    this.name = 'ValidationError';
   }
 }
