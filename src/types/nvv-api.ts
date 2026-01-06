@@ -107,3 +107,11 @@ export interface County {
   code: string;
   name: string;
 }
+
+/**
+ * Constants for NVV API
+ */
+
+// Default decision status for area queries
+// "Gällande" means "Current/Valid" in Swedish
+export const DEFAULT_DECISION_STATUS = "Gällande";

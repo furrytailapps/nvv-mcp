@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { nvvClient } from "@/clients/nvv-client";
 import { withErrorHandling } from "@/lib/response";
+import { DEFAULT_DECISION_STATUS } from "@/types/nvv-api";
 
 export const getAreaLandCoverInputSchema = {
   areaId: z.string()
@@ -27,7 +28,7 @@ type GetAreaLandCoverInput = {
 
 export const getAreaLandCoverHandler = withErrorHandling(
   async (args: GetAreaLandCoverInput) => {
-    const { areaId, status = "Gällande" } = args;
+    const { areaId, status = DEFAULT_DECISION_STATUS } = args;
     const landCover = await nvvClient.getAreaLandCover(areaId, status);
 
     return {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { nvvClient } from "@/clients/nvv-client";
 import { withErrorHandling } from "@/lib/response";
+import { DEFAULT_DECISION_STATUS } from "@/types/nvv-api";
 
 export const getAreaGeometryInputSchema = {
   areaId: z.string()
@@ -28,7 +29,7 @@ type GetAreaGeometryInput = {
 
 export const getAreaGeometryHandler = withErrorHandling(
   async (args: GetAreaGeometryInput) => {
-    const { areaId, status = "Gällande" } = args;
+    const { areaId, status = DEFAULT_DECISION_STATUS } = args;
     const geometry = await nvvClient.getAreaWkt(areaId, status);
 
     return {
