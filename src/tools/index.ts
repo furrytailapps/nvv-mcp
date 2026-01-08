@@ -1,29 +1,17 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
+// Consolidated tools
 import { listProtectedAreasTool, listProtectedAreasHandler } from './list-protected-areas';
-import { getAreaGeometryTool, getAreaGeometryHandler } from './get-area-geometry';
-import { getAreaPurposesTool, getAreaPurposesHandler } from './get-area-purposes';
-import { getAreaLandCoverTool, getAreaLandCoverHandler } from './get-area-land-cover';
-import { getAreaEnvironmentalGoalsTool, getAreaEnvironmentalGoalsHandler } from './get-area-env-goals';
-import { getAreaRegulationsTool, getAreaRegulationsHandler } from './get-area-regulations';
-import { getAreaDocumentsTool, getAreaDocumentsHandler } from './get-area-documents';
+import { getAreaDetailTool, getAreaDetailHandler } from './get-area-detail';
+import { lookupTool, lookupHandler } from './lookup';
 import { getAreasExtentTool, getAreasExtentHandler } from './get-areas-extent';
-import { lookupMunicipalityTool, lookupMunicipalityHandler } from './lookup-municipality';
-import { lookupCountyTool, lookupCountyHandler } from './lookup-county';
 
+// Tool registry: consolidated from 10 tools to 4
 const tools = [
-  // NVV API wrapper tools
   { definition: listProtectedAreasTool, handler: listProtectedAreasHandler },
-  { definition: getAreaGeometryTool, handler: getAreaGeometryHandler },
-  { definition: getAreaPurposesTool, handler: getAreaPurposesHandler },
-  { definition: getAreaLandCoverTool, handler: getAreaLandCoverHandler },
-  { definition: getAreaEnvironmentalGoalsTool, handler: getAreaEnvironmentalGoalsHandler },
-  { definition: getAreaRegulationsTool, handler: getAreaRegulationsHandler },
-  { definition: getAreaDocumentsTool, handler: getAreaDocumentsHandler },
+  { definition: getAreaDetailTool, handler: getAreaDetailHandler },
+  { definition: lookupTool, handler: lookupHandler },
   { definition: getAreasExtentTool, handler: getAreasExtentHandler },
-  // Lookup tools
-  { definition: lookupMunicipalityTool, handler: lookupMunicipalityHandler },
-  { definition: lookupCountyTool, handler: lookupCountyHandler },
 ];
 
 /**

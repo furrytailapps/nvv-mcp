@@ -19,14 +19,7 @@ export const listProtectedAreasInputSchema = {
         'Use län when searching across an entire region, or when the specific municipality is unknown.',
     ),
   namn: z.string().optional().describe('Search by area name (partial match supported)'),
-  limit: z
-    .number()
-    .int()
-    .min(1)
-    .max(500)
-    .default(100)
-    .optional()
-    .describe('Maximum number of areas to return (1-500, default: 100)'),
+  limit: z.number().optional().describe('Max areas to return (1-500, default: 100)'),
 };
 
 export const listProtectedAreasTool = {
