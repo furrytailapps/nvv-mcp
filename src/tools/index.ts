@@ -6,6 +6,7 @@ import { getAreaPurposesTool, getAreaPurposesHandler } from './get-area-purposes
 import { getAreaLandCoverTool, getAreaLandCoverHandler } from './get-area-land-cover';
 import { getAreaEnvironmentalGoalsTool, getAreaEnvironmentalGoalsHandler } from './get-area-env-goals';
 import { getAreaRegulationsTool, getAreaRegulationsHandler } from './get-area-regulations';
+import { getAreaDocumentsTool, getAreaDocumentsHandler } from './get-area-documents';
 import { getAreasExtentTool, getAreasExtentHandler } from './get-areas-extent';
 import { lookupMunicipalityTool, lookupMunicipalityHandler } from './lookup-municipality';
 import { lookupCountyTool, lookupCountyHandler } from './lookup-county';
@@ -18,6 +19,7 @@ const tools = [
   { definition: getAreaLandCoverTool, handler: getAreaLandCoverHandler },
   { definition: getAreaEnvironmentalGoalsTool, handler: getAreaEnvironmentalGoalsHandler },
   { definition: getAreaRegulationsTool, handler: getAreaRegulationsHandler },
+  { definition: getAreaDocumentsTool, handler: getAreaDocumentsHandler },
   { definition: getAreasExtentTool, handler: getAreasExtentHandler },
   // Lookup tools
   { definition: lookupMunicipalityTool, handler: lookupMunicipalityHandler },

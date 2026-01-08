@@ -48,6 +48,16 @@ export interface NvvForeskriftsomrade {
   areaHa: number;
 }
 
+export interface NvvDocument {
+  id: string;
+  namn: string;
+  fileUrl: string;
+  beslutstyp: string;
+  beslutsmyndighet: string;
+  beslutsdatum: number;
+  gallandedatum: number;
+}
+
 /**
  * Transformed types for tool responses
  */
@@ -96,6 +106,16 @@ export interface Regulation {
   type: string;
   subtype: string;
   area_ha: number;
+}
+
+export interface Document {
+  id: string;
+  name: string;
+  file_url: string;
+  decision_type: string;
+  decision_authority: string;
+  decision_date: number;
+  valid_date: number;
 }
 
 export interface Municipality {

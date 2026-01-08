@@ -7,11 +7,13 @@ import {
   type NvvNmdKlass,
   type NvvMiljomal,
   type NvvForeskriftsomrade,
+  type NvvDocument,
   type ProtectedArea,
   type Purpose,
   type LandCover,
   type EnvironmentalGoal,
   type Regulation,
+  type Document,
 } from '@/types/nvv-api';
 
 const NVV_API_BASE = 'https://geodata.naturvardsverket.se/naturvardsregistret/rest/v3';
@@ -123,6 +125,23 @@ export const nvvClient = {
       type: f.foreskriftstyp,
       subtype: f.foreskriftssubtyp,
       area_ha: f.areaHa,
+    }));
+  },
+
+  /**
+   * Get decision documents (PDF links for decisions and management plans)
+   * Endpoint: GET /omrade/{areaId}/{status}/beslutsdokument
+   */
+  async getAreaDocuments(areaId: string, status = DEFAULT_DECISION_STATUS): Promise<Document[]> {
+    const data = await client.request<NvvDocument[]>(`/omrade/${areaId}/${encodeURIComponent(status)}/beslutsdokument`);
+    return data.map((d) => ({
+      id: d.id,
+      name: d.namn,
+      file_url: d.fileUrl,
+      decision_type: d.beslutstyp,
+      decision_authority: d.beslutsmyndighet,
+      decision_date: d.beslutsdatum,
+      valid_date: d.gallandedatum,
     }));
   },
 
