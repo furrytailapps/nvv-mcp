@@ -10,7 +10,8 @@ export const getAreasExtentTool = {
   name: 'nvv_get_areas_extent',
   description:
     'Calculate the combined bounding box (extent) for multiple protected areas as WKT. ' +
-    'Useful for determining the geographic extent to display on a map.',
+    'Useful for determining the geographic extent to display on a map. ' +
+    'Note: May take 1-2 seconds due to upstream API limitations.',
   inputSchema: getAreasExtentInputSchema,
 };
 

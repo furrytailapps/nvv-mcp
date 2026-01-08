@@ -52,24 +52,45 @@ export const getAreaDetailHandler = withErrorHandling(async (args: GetAreaDetail
     coordinate_system: 'EPSG:3006 (SWEREF99 TM)',
   };
 
-  // Fetch requested data types
-  if (include === 'all' || include === 'geometry') {
-    result.geometry = await nvvClient.getAreaWkt(areaId, status);
+  // Fetch all data types in parallel for better performance
+  if (include === 'all') {
+    const [geometry, purposes, land_cover, regulations, env_goals, documents] = await Promise.all([
+      nvvClient.getAreaWkt(areaId, status),
+      nvvClient.getAreaPurposes(areaId, status),
+      nvvClient.getAreaLandCover(areaId, status),
+      nvvClient.getAreaRegulations(areaId, status),
+      nvvClient.getAreaEnvironmentalGoals(areaId, status),
+      nvvClient.getAreaDocuments(areaId, status),
+    ]);
+    result.geometry = geometry;
+    result.purposes = purposes;
+    result.land_cover = land_cover;
+    result.regulations = regulations;
+    result.env_goals = env_goals;
+    result.documents = documents;
+    return result;
   }
-  if (include === 'all' || include === 'purposes') {
-    result.purposes = await nvvClient.getAreaPurposes(areaId, status);
-  }
-  if (include === 'all' || include === 'land_cover') {
-    result.land_cover = await nvvClient.getAreaLandCover(areaId, status);
-  }
-  if (include === 'all' || include === 'regulations') {
-    result.regulations = await nvvClient.getAreaRegulations(areaId, status);
-  }
-  if (include === 'all' || include === 'env_goals') {
-    result.env_goals = await nvvClient.getAreaEnvironmentalGoals(areaId, status);
-  }
-  if (include === 'all' || include === 'documents') {
-    result.documents = await nvvClient.getAreaDocuments(areaId, status);
+
+  // Fetch single data type
+  switch (include) {
+    case 'geometry':
+      result.geometry = await nvvClient.getAreaWkt(areaId, status);
+      break;
+    case 'purposes':
+      result.purposes = await nvvClient.getAreaPurposes(areaId, status);
+      break;
+    case 'land_cover':
+      result.land_cover = await nvvClient.getAreaLandCover(areaId, status);
+      break;
+    case 'regulations':
+      result.regulations = await nvvClient.getAreaRegulations(areaId, status);
+      break;
+    case 'env_goals':
+      result.env_goals = await nvvClient.getAreaEnvironmentalGoals(areaId, status);
+      break;
+    case 'documents':
+      result.documents = await nvvClient.getAreaDocuments(areaId, status);
+      break;
   }
 
   return result;
