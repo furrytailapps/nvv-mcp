@@ -14,8 +14,8 @@ export const lookupCountyTool = {
   name: 'nvv_lookup_county',
   description:
     'Search for Swedish county codes (länskoder). ' +
-    'Useful for finding the correct code to use with nvv_list_protected_areas. ' +
-    'Supports fuzzy search by county name.',
+    "Returns letter codes (e.g., 'AB' for Stockholm, 'M' for Skåne, 'O' for Västra Götaland). " +
+    'Use this when you need to search a broad region with nvv_list_protected_areas.',
   inputSchema: lookupCountyInputSchema,
 };
 
