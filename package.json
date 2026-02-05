@@ -5,7 +5,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/furrytailapps/nvv-mcp.git"
+    "url": "https://github.com/furrytailapps/mcp-nvv.git"
   },
   "keywords": [
     "mcp",
@@ -18,9 +18,9 @@
   ],
   "author": "Yesper",
   "bugs": {
-    "url": "https://github.com/furrytailapps/nvv-mcp/issues"
+    "url": "https://github.com/furrytailapps/mcp-nvv/issues"
   },
-  "homepage": "https://github.com/furrytailapps/nvv-mcp",
+  "homepage": "https://github.com/furrytailapps/mcp-nvv",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
