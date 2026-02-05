@@ -14,7 +14,7 @@ MCP server wrapping Naturvårdsverket (Swedish Environmental Protection Agency) 
 https://nvv-mcp.vercel.app/mcp
 ```
 
-## Available Tools (7)
+## Available Tools (<!-- AUTO:tool_count -->7<!-- /AUTO -->)
 
 ### Naturvardsregistret (National)
 
