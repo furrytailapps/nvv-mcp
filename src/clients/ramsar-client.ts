@@ -1,6 +1,6 @@
 import { createHttpClient } from '@/lib/http-client';
 import { runWithConcurrency, NVV_API_CONCURRENCY } from '@/lib/concurrency';
-import { extractBoundingBoxFromWkt, combineBoundingBoxes, boundingBoxToWkt } from '@/lib/wkt-utils';
+import { extractBoundingBoxFromWkt, combineBoundingBoxes, boundingBoxToWkt, convertWktToWgs84 } from '@/lib/wkt-utils';
 import {
   type RamsarRawArea,
   type RamsarRawNmdKlass,
@@ -95,11 +95,12 @@ export const ramsarClient = {
   },
 
   /**
-   * Get WKT geometry for a Ramsar area
+   * Get WKT geometry for a Ramsar area (returned in WGS84)
    * Endpoint: GET /ramsar/{id}/wkt
    */
   async getAreaWkt(id: string): Promise<string> {
-    return client.request<string>(`/ramsar/${encodeURIComponent(id)}/wkt`);
+    const wkt = await client.request<string>(`/ramsar/${encodeURIComponent(id)}/wkt`);
+    return convertWktToWgs84(wkt);
   },
 
   /**
@@ -121,7 +122,7 @@ export const ramsarClient = {
   },
 
   /**
-   * Get bounding box for multiple areas
+   * Get bounding box for multiple areas (returned in WGS84)
    */
   async getAreasExtent(ids: string[]): Promise<string> {
     try {
@@ -130,7 +131,7 @@ export const ramsarClient = {
       });
 
       if (result.startsWith('POLYGON')) {
-        return result;
+        return convertWktToWgs84(result);
       }
 
       throw new Error('Invalid WKT response');
@@ -141,14 +142,17 @@ export const ramsarClient = {
   },
 
   /**
-   * Client-side extent calculation fallback
+   * Client-side extent calculation fallback (returns WGS84)
+   * Note: getAreaWkt already returns WGS84 coordinates
    */
   async computeExtentClientSide(ids: string[]): Promise<string> {
+    // Note: getAreaWkt already converts to WGS84
     const wktResults = await runWithConcurrency(
       ids.map((id) => () => this.getAreaWkt(id)),
       NVV_API_CONCURRENCY,
     );
 
+    // Extract bounding boxes (already in WGS84)
     const boundingBoxes = wktResults.map(extractBoundingBoxFromWkt);
     const combinedBox = combineBoundingBoxes(boundingBoxes);
     return boundingBoxToWkt(combinedBox);

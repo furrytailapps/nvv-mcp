@@ -1,6 +1,6 @@
 import { createHttpClient } from '@/lib/http-client';
 import { runWithConcurrency, NVV_API_CONCURRENCY } from '@/lib/concurrency';
-import { extractBoundingBoxFromWkt, combineBoundingBoxes, boundingBoxToWkt } from '@/lib/wkt-utils';
+import { extractBoundingBoxFromWkt, combineBoundingBoxes, boundingBoxToWkt, convertWktToWgs84 } from '@/lib/wkt-utils';
 import {
   type N2000RawArea,
   type N2000RawSpecies,
@@ -149,11 +149,12 @@ export const n2000Client = {
   },
 
   /**
-   * Get WKT geometry for a Natura 2000 area
+   * Get WKT geometry for a Natura 2000 area (returned in WGS84)
    * Endpoint: GET /omrade/{kod}/wkt
    */
   async getAreaWkt(kod: string): Promise<string> {
-    return client.request<string>(`/omrade/${encodeURIComponent(kod)}/wkt`);
+    const wkt = await client.request<string>(`/omrade/${encodeURIComponent(kod)}/wkt`);
+    return convertWktToWgs84(wkt);
   },
 
   /**
@@ -201,7 +202,7 @@ export const n2000Client = {
   },
 
   /**
-   * Get bounding box for multiple areas
+   * Get bounding box for multiple areas (returned in WGS84)
    * Uses same workaround pattern as nvvClient for API bugs
    */
   async getAreasExtent(kods: string[]): Promise<string> {
@@ -211,7 +212,7 @@ export const n2000Client = {
       });
 
       if (result.startsWith('POLYGON')) {
-        return result;
+        return convertWktToWgs84(result);
       }
 
       throw new Error('Invalid WKT response');
@@ -222,14 +223,17 @@ export const n2000Client = {
   },
 
   /**
-   * Client-side extent calculation fallback
+   * Client-side extent calculation fallback (returns WGS84)
+   * Note: getAreaWkt already returns WGS84 coordinates
    */
   async computeExtentClientSide(kods: string[]): Promise<string> {
+    // Note: getAreaWkt already converts to WGS84
     const wktResults = await runWithConcurrency(
       kods.map((kod) => () => this.getAreaWkt(kod)),
       NVV_API_CONCURRENCY,
     );
 
+    // Extract bounding boxes (already in WGS84)
     const boundingBoxes = wktResults.map(extractBoundingBoxFromWkt);
     const combinedBox = combineBoundingBoxes(boundingBoxes);
     return boundingBoxToWkt(combinedBox);

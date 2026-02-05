@@ -1,6 +1,6 @@
 import { createHttpClient } from '@/lib/http-client';
 import { runWithConcurrency, NVV_API_CONCURRENCY } from '@/lib/concurrency';
-import { extractBoundingBoxFromWkt, combineBoundingBoxes, boundingBoxToWkt } from '@/lib/wkt-utils';
+import { extractBoundingBoxFromWkt, combineBoundingBoxes, boundingBoxToWkt, convertWktToWgs84 } from '@/lib/wkt-utils';
 import {
   DEFAULT_DECISION_STATUS,
   type NvvArea,
@@ -73,11 +73,12 @@ export const nvvClient = {
   },
 
   /**
-   * Get WKT geometry for an area
+   * Get WKT geometry for an area (returned in WGS84)
    * Endpoint: GET /omrade/{areaId}/{status}/wkt
    */
   async getAreaWkt(areaId: string, status = DEFAULT_DECISION_STATUS): Promise<string> {
-    return client.request<string>(`/omrade/${areaId}/${encodeURIComponent(status)}/wkt`);
+    const wkt = await client.request<string>(`/omrade/${areaId}/${encodeURIComponent(status)}/wkt`);
+    return convertWktToWgs84(wkt);
   },
 
   /**
@@ -147,7 +148,7 @@ export const nvvClient = {
   },
 
   /**
-   * Get bounding box for multiple areas
+   * Get bounding box for multiple areas (returned in WGS84)
    * Endpoint: GET /omrade/extentAsWkt
    *
    * WORKAROUND: The NVV API has a bug where calling this endpoint with multiple IDs
@@ -163,7 +164,7 @@ export const nvvClient = {
 
       // Check if response is valid WKT (starts with POLYGON)
       if (result.startsWith('POLYGON')) {
-        return result;
+        return convertWktToWgs84(result);
       }
 
       // Response was not valid WKT, fall back to workaround
@@ -176,7 +177,7 @@ export const nvvClient = {
   },
 
   /**
-   * WORKAROUND: Client-side extent calculation
+   * WORKAROUND: Client-side extent calculation (returns WGS84)
    *
    * This method exists because the NVV API's /omrade/extentAsWkt endpoint
    * fails with Oracle error ORA-28579 when called with multiple area IDs.
@@ -184,24 +185,28 @@ export const nvvClient = {
    * We fetch individual WKT geometries for each area, extract their bounding boxes,
    * and compute a combined bounding box.
    *
+   * Note: getAreaWkt already returns WGS84 coordinates, so the bounding box
+   * is computed in WGS84 space.
+   *
    * TODO: Remove when NVV fixes their API. Test by calling:
    *   curl "https://geodata.naturvardsverket.se/naturvardsregistret/rest/v3/omrade/extentAsWkt?id=2000019,2000140"
    * If it returns valid WKT instead of Oracle error, the bug is fixed.
    */
   async computeExtentClientSide(areaIds: string[]): Promise<string> {
     // Fetch WKT geometry for each area with limited concurrency to avoid 503s
+    // Note: getAreaWkt already converts to WGS84
     const wktResults = await runWithConcurrency(
       areaIds.map((id) => () => this.getAreaWkt(id)),
       NVV_API_CONCURRENCY,
     );
 
-    // Extract bounding box from each geometry
+    // Extract bounding box from each geometry (already in WGS84)
     const boundingBoxes = wktResults.map(extractBoundingBoxFromWkt);
 
     // Combine all bounding boxes into one
     const combinedBox = combineBoundingBoxes(boundingBoxes);
 
-    // Convert back to WKT format
+    // Convert back to WKT format (WGS84 coordinates)
     return boundingBoxToWkt(combinedBox);
   },
 };

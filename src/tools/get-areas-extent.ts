@@ -26,6 +26,6 @@ export const getAreasExtentHandler = withErrorHandling(async (args: GetAreasExte
     area_ids: args.areaIds,
     count: args.areaIds.length,
     extent,
-    coordinate_system: 'EPSG:3006 (SWEREF99 TM)',
+    coordinate_system: 'EPSG:4326 (WGS84)',
   };
 });

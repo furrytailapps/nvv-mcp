@@ -1,16 +1,19 @@
 /**
- * WORKAROUND: WKT utilities for client-side bounding box calculation
+ * WKT utilities for geometry processing and coordinate conversion
  *
- * This module exists because the NVV API's /omrade/extentAsWkt endpoint
- * fails with Oracle error ORA-28579 when called with multiple area IDs.
+ * Includes:
+ * - Client-side bounding box calculation (workaround for NVV API bug)
+ * - WKT coordinate conversion from SWEREF99TM to WGS84
  *
- * The bug is in their st_aggr_union Oracle spatial function which crashes
- * when trying to aggregate multiple geometries.
+ * WORKAROUND: The NVV API's /omrade/extentAsWkt endpoint fails with Oracle
+ * error ORA-28579 when called with multiple area IDs.
  *
- * TODO: Remove this file when NVV fixes their API bug. Test by calling:
+ * TODO: Remove workaround when NVV fixes their API bug. Test by calling:
  *   curl "https://geodata.naturvardsverket.se/naturvardsregistret/rest/v3/omrade/extentAsWkt?id=2000019,2000140"
  * If it returns valid WKT (starting with "POLYGON") instead of Oracle error, the bug is fixed.
  */
+
+import { sweref99ToWgs84 } from './coordinates';
 
 export interface BoundingBox {
   minX: number;
@@ -82,4 +85,31 @@ export function combineBoundingBoxes(boxes: BoundingBox[]): BoundingBox {
 export function boundingBoxToWkt(box: BoundingBox): string {
   const { minX, maxX, minY, maxY } = box;
   return `POLYGON (( ${minX} ${minY}, ${maxX} ${minY}, ${maxX} ${maxY}, ${minX} ${maxY}, ${minX} ${minY}))`;
+}
+
+/**
+ * Convert WKT geometry from SWEREF99TM to WGS84
+ *
+ * Parses WKT string, converts each coordinate pair from SWEREF99TM (x, y)
+ * to WGS84 (longitude, latitude), and reconstructs the WKT string.
+ *
+ * Supports POLYGON, MULTIPOLYGON, POINT, LINESTRING, and other common WKT types.
+ * Preserves geometry structure and formatting.
+ */
+export function convertWktToWgs84(wkt: string): string {
+  // Match all coordinate pairs: "number number" (x y in SWEREF99TM)
+  // Capture groups: (x-coordinate) (y-coordinate)
+  const coordPattern = /(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g;
+
+  return wkt.replace(coordPattern, (_match, xStr: string, yStr: string) => {
+    const x = parseFloat(xStr);
+    const y = parseFloat(yStr);
+
+    // Convert from SWEREF99TM to WGS84
+    const wgs84 = sweref99ToWgs84({ x, y });
+
+    // WKT uses "x y" format which is "longitude latitude" for WGS84
+    // Round to 6 decimal places (about 11cm precision)
+    return `${wgs84.longitude.toFixed(6)} ${wgs84.latitude.toFixed(6)}`;
+  });
 }

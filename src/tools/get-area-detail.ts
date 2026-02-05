@@ -49,7 +49,7 @@ export const getAreaDetailHandler = withErrorHandling(async (args: GetAreaDetail
   const result: Record<string, unknown> = {
     areaId,
     status,
-    coordinate_system: 'EPSG:3006 (SWEREF99 TM)',
+    coordinate_system: 'EPSG:4326 (WGS84)',
   };
 
   // Fetch all data types with limited concurrency (2 at a time) to avoid overwhelming upstream API
